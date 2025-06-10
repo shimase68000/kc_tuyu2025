@@ -14,15 +14,38 @@
 
     <style>
         body {
-          background-color: #f3eade;
+            background-color: #f3eade;
         }
-        .syutugeki-text {
-          color: #ec6463;
-          font-weight: normal;
+        .syutugeki_text {
+            color: #ec6463;
+            font-weight: normal;
         }
-        .ensyu-text {
-          color: #5da344;
-          font-weight: normal;
+        .ensyu_text {
+            color: #5da344;
+            font-weight: normal;
+        }
+        .color_ivent_finish {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .color_mission_reset {
+            color: #0000ff;
+            font-weight: normal;
+        }
+        .color_remind {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .color_maxitem {
+            color: #0000ff;
+            font-weight: normal;
+        }
+        .color_r_myitem {
+            color: #006000;
+            font-weight: normal;
+        }
+        .textstyle_bold {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -45,6 +68,7 @@
         const str_myitem   = "◎現在のてるてる坊主数";
         const str_r_myitem = "◎てるてる坊主残数";
         const str_item     = "坊主";
+        const str_counter_word = "体";  // "個";
 
         const key_myitem = "kcolle_tuyu2025_teruteru";
 
@@ -55,15 +79,11 @@
         const remindTime = 6 * (24 * 60 * 60 * 1000);      // リマインドの表示は終了 6日前から
         const s_count  = 60;  // 時刻補正は60秒毎
 
-        const color_ivent_finish = "#ff0000";
-        const color_mission_reset = "#0000ff";
-        const color_remind = "#ff0000";
-        const color_maxitem = "#0000ff";
-        const color_r_myitem = "#006000";
         const days = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
 
         // 日間任務
         const d_quest = [
+// 任務名称, アイテム個数
             "[演習]【梅雨限定任務】海上護衛隊、雨中演習！", 1
         ];
         // 週間任務
@@ -80,6 +100,7 @@
         ];
         // イベント報酬
         const item = [
+// 報酬名称, 必要アイテム数, 報酬上限
 //            "対潜哨戒柊（東海(九〇一空)）[要]開発資材x80", 33, 1,
 //            "改装設計桝（改装設計図）", 20, 99,
 //            "恵方翼（新型航空機設計図）", 18, 99,
@@ -150,7 +171,7 @@
 
                 i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
 
-                document.querySelector("#tg000").innerHTML = `<b><font color=${color_ivent_finish}>${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</font></b> (${tempDays}.${diffHours.toString().padStart(2,'0')}:${tempMinutes.toString().padStart(2,'0')}:${tempSeconds.toString().padStart(2,'0')})`
+                document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${diffHours.toString().padStart(2,'0')}:${tempMinutes.toString().padStart(2,'0')}:${tempSeconds.toString().padStart(2,'0')})`
                 document.querySelector("#tg010").innerHTML = "";
                 document.querySelector("#tg011").innerHTML = "";
             } else {
@@ -161,7 +182,7 @@
                     } else {
                         document.querySelector("#tg010").innerHTML = `第${i_week}週の${i_day}日目（${days[i_day % 7]}）です。`;
                     }
-                    document.querySelector("#tg011").innerHTML = "　<font color=${color_mission_reset}>[任務の更新は 05:00 AM]</font>";
+                    document.querySelector("#tg011").innerHTML = `　<span class="color_mission_reset">[任務の更新は 05:00 AM]</span>`;
                 } else {
                     document.querySelector("#tg010").innerHTML = `第${i_week}週の${i_day}日目（${days[i_day % 7]}）です。`;
                     document.querySelector("#tg011").innerHTML = "";
@@ -176,9 +197,9 @@
                 r_Seconds = Math.floor((r_Date % (1000 * 60)) / 1000);
 
                 if( r_Days > 0 ) {
-                    document.querySelector("#tg020").innerHTML = `<b><font color=${color_remind}>イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
+                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</span>`;
                 } else {
-                    document.querySelector("#tg020").innerHTML = `<b><font color=${color_remind}>イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
+                    document.querySelector("#tg020").innerHTML = `<span class"color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</span>`;
                 }
             } else {
                 document.querySelector("#tg020").innerHTML = "";
@@ -193,7 +214,7 @@
                     if (i % 2 === 0) {
                         let name = d_quest[i];
                         let count = d_quest[i + 1];
-                        document.querySelector(`#tg10${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}個 ×${diffDays + 1} ⇒ <b>${count * (diffDays + 1)}個</b>`;
+                        document.querySelector(`#tg10${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffDays + 1} ⇒ <span class="textstyle_bold">${count * (diffDays + 1)}${str_counter_word}</span>`;
                         sum += count * (diffDays + 1);
                     }
                 });
@@ -203,7 +224,7 @@
                     if (i % 2 === 0) {
                         let name = w_quest[i];
                         let count = w_quest[i + 1];
-                        document.querySelector(`#tg11${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}個 ×${i_week} ⇒ <b>${count * i_week}個</b>`;
+                        document.querySelector(`#tg11${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${i_week} ⇒ <span class="textstyle_bold">${count * i_week}${str_counter_word}</span>`;
                         sum += count * i_week;
                     }
                 });
@@ -213,7 +234,7 @@
                     if (i % 2 === 0) {
                         let name = m_quest[i];
                         let count = m_quest[i + 1];
-                        document.querySelector(`#tg12${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}個 ×${diffMonths} ⇒ <b>${count * diffMonths}個</b>`;
+                        document.querySelector(`#tg12${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffMonths} ⇒ <span class="textstyle_bold">${count * diffMonths}${str_counter_word}</span>`;
                         sum += count * diffMonths;
                     }
                 });
@@ -223,22 +244,22 @@
                     if (i % 2 === 0) {
                         let name = s_quest[i];
                         let count = s_quest[i + 1];
-                        document.querySelector(`#tg13${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}個 ⇒ <b>${count}個</b>`;
+                        document.querySelector(`#tg13${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ⇒ <span class="textstyle_bold">${count}${str_counter_word}</span>`;
                         sum += count;
                     }
                 });
 
                 myitem = isLocalStorageAvailable() ? localStorage.getItem(key_myitem) || sum : sum;
-                document.querySelector("#tg200").innerHTML = `<font color=${color_maxitem}>${str_maxitem}：<b>${sum}個</b></font>`;
+                document.querySelector("#tg200").innerHTML = `<span class="color_maxitem">${str_maxitem}：<span class="textstyle_bold">${sum}${str_counter_word}</span></span>`;
             }
 
             if( STATUS !== "報酬不明" ) d_tg300();
 
             document.querySelectorAll("p").forEach(function(p) {
-                p.innerHTML = p.innerHTML.replace(/<span>\[出撃\]/g, '<span class="syutugeki-text">[出撃]');
+                p.innerHTML = p.innerHTML.replace(/<span>\[出撃\]/g, '<span class="syutugeki_text">[出撃]');
             });
             document.querySelectorAll("p").forEach(function(p) {
-                p.innerHTML = p.innerHTML.replace(/<span>\[演習\]/g, '<span class="ensyu-text">[演習]');
+                p.innerHTML = p.innerHTML.replace(/<span>\[演習\]/g, '<span class="ensyu_text">[演習]');
             });
         }
 
@@ -249,10 +270,10 @@
 
             do {
                 r_myitem = myitem;
-                document.querySelector("#tg300").innerHTML = `<font color=${color_maxitem}>${str_myitem}：
-                    <b><button id="myitem_dec">ー</button>
-                    <span id="myitem_sum">${myitem}</span>個
-                    <button id="myitem_inc">＋</button></b></font>`;
+                document.querySelector("#tg300").innerHTML = `<span class="color_maxitem">${str_myitem}：
+                    <span class="textstyle_bold"><button id="myitem_dec">ー</button>
+                    <span id="myitem_sum">${myitem}</span>${str_counter_word}
+                    <button id="myitem_inc">＋</button></span></span>`;
 
                 // 報酬計算
                 let jj = -1;
@@ -261,13 +282,13 @@
                         let j = Math.floor(i / 3);
                         let cost = item[i + 1];
                         r_myitem -= item_count[j] * cost;
-                        document.querySelector(`#tg30${j + 1}`).innerHTML = `　●${item[i]} : 必要${str_item}数 ${cost}個　
+                        document.querySelector(`#tg30${j + 1}`).innerHTML = `　●${item[i]} : 必要${str_item}数 ${cost}${str_counter_word}　
                             <button id="item_dec${j}">ー</button>
-                            <b><span id="item_count${j}">${item_count[j]}</span>回交換</b>
+                            <span class="textstyle_bold"><span id="item_count${j}">${item_count[j]}</span>回交換</span>
                             <button id="item_inc${j}">＋</button>`;
                         if(item_count[j] > 0) {
                             jj = j;
-                            document.querySelector(`#tg31${j + 1}`).innerHTML = ` ⇒ <b>${item_count[j] * item[i+1]}個</b>消費`;
+                            document.querySelector(`#tg31${j + 1}`).innerHTML = ` ⇒ <span class="textstyle_bold">${item_count[j] * item[i+1]}${str_counter_word}</span>消費`;
                         } else {
                             document.querySelector(`#tg31${j + 1}`).innerHTML = "";
                         }
@@ -278,7 +299,7 @@
 
             } while( r_myitem < 0 );
 
-            document.querySelector("#tg400").innerHTML = `<font color=${color_r_myitem}>${str_r_myitem}：<b>${r_myitem}個</b></font>`;
+            document.querySelector("#tg400").innerHTML = `<span class="color_r_myitem">${str_r_myitem}：<span class="textstyle_bold">${r_myitem}${str_counter_word}</span></span>`;
         }
 
         function isLocalStorageAvailable() {
