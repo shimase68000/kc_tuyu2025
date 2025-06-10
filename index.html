@@ -1,3 +1,11 @@
+<!--
+  File: index.html
+  Author: UG.
+  Created: 2025-06-03
+  Last Updated: 2025-06-10
+  HTML Version: WHATWG HTML Living Standard
+-->
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -23,8 +31,8 @@
     <h2 id="event-title"></h2>
 
     <p id="tg000"></p>
-    <p id="tg001"></p>
-    <p id="tg002"></p>
+    <p><span id="tg010"></span><span id="tg011"></span></p>
+    <p id="tg020"></p>
 
     <script>
         const STATUS = "報酬不明"; // "報酬有り";
@@ -47,6 +55,9 @@
         const remindTime = 6 * (24 * 60 * 60 * 1000);      // リマインドの表示は終了 6日前から
         const s_count  = 60;  // 時刻補正は60秒毎
 
+        const color_ivent_finish = "#ff0000";
+        const color_mission_reset = "#0000ff";
+        const color_remind = "#ff0000";
         const color_maxitem = "#0000ff";
         const color_r_myitem = "#006000";
         const days = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
@@ -123,6 +134,7 @@
             let days_adjust = (baseDate.getDay() + 6) % 7;
             let i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
             let i_day = (currentDate.getDay() + 6) % 7 + 1;
+            let i_hours = currentDate.getHours();
 
             let tempDiff = finishDate - baseDate;
             if( diffMs >= tempDiff ) {
@@ -138,11 +150,22 @@
 
                 i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
 
-                document.querySelector("#tg000").innerHTML = `<b><font color="red">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</font></b> (${tempDays}.${diffHours.toString().padStart(2,'0')}:${tempMinutes.toString().padStart(2,'0')}:${tempSeconds.toString().padStart(2,'0')})`
-                document.querySelector("#tg001").innerHTML = "";
+                document.querySelector("#tg000").innerHTML = `<b><font color=${color_ivent_finish}>${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</font></b> (${tempDays}.${diffHours.toString().padStart(2,'0')}:${tempMinutes.toString().padStart(2,'0')}:${tempSeconds.toString().padStart(2,'0')})`
+                document.querySelector("#tg010").innerHTML = "";
+                document.querySelector("#tg011").innerHTML = "";
             } else {
                 document.querySelector("#tg000").innerHTML = `${ivent_name2}開始から ${diffDays + 1}日目。(${diffDays}.${diffHours.toString().padStart(2,'0')}:${diffMinutes.toString().padStart(2,'0')}:${diffSeconds.toString().padStart(2,'0')})`
-                document.querySelector("#tg001").innerHTML = `第${i_week}週の${i_day}日目（${days[i_day % 7]}）です。`;
+                if( i_hours >= 0 && i_hours <= 4 ) {
+                    if( i_day === 1 ) {
+                        document.querySelector("#tg010").innerHTML = `第${i_week+1}週の${i_day}日目（${days[i_day % 7]}）です。`;
+                    } else {
+                        document.querySelector("#tg010").innerHTML = `第${i_week}週の${i_day}日目（${days[i_day % 7]}）です。`;
+                    }
+                    document.querySelector("#tg011").innerHTML = "　<font color=${color_mission_reset}>[任務の更新は 05:00 AM]</font>";
+                } else {
+                    document.querySelector("#tg010").innerHTML = `第${i_week}週の${i_day}日目（${days[i_day % 7]}）です。`;
+                    document.querySelector("#tg011").innerHTML = "";
+                }
             }
 
             let r_Date = finishDate - currentDate + 1000;
@@ -153,12 +176,12 @@
                 r_Seconds = Math.floor((r_Date % (1000 * 60)) / 1000);
 
                 if( r_Days > 0 ) {
-                    document.querySelector("#tg002").innerHTML = `<b><font color="red">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
+                    document.querySelector("#tg020").innerHTML = `<b><font color=${color_remind}>イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
                 } else {
-                    document.querySelector("#tg002").innerHTML = `<b><font color="red">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
+                    document.querySelector("#tg020").innerHTML = `<b><font color=${color_remind}>イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</font></b>`;
                 }
             } else {
-                document.querySelector("#tg002").innerHTML = "";
+                document.querySelector("#tg020").innerHTML = "";
             }
 
             if (diffDays !== prevDays) {
