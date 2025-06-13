@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-10
+  Last Updated: 2025-06-13
   HTML Version: WHATWG HTML Living Standard
 -->
 
@@ -80,6 +80,7 @@
         const s_count  = 60;  // 時刻補正は60秒毎
 
         const days = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+        const pad = (n,d) => n.toString().padStart(d, '0');
 
         // 日間任務
         const d_quest = [
@@ -171,11 +172,11 @@
 
                 i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
 
-                document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${diffHours.toString().padStart(2,'0')}:${tempMinutes.toString().padStart(2,'0')}:${tempSeconds.toString().padStart(2,'0')})`
+                document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${pad(diffHours,2)}:${pad(tempMinutes,2)}:${pad(tempSeconds,2)})`
                 document.querySelector("#tg010").innerHTML = "";
                 document.querySelector("#tg011").innerHTML = "";
             } else {
-                document.querySelector("#tg000").innerHTML = `${ivent_name2}開始から ${diffDays + 1}日目。(${diffDays}.${diffHours.toString().padStart(2,'0')}:${diffMinutes.toString().padStart(2,'0')}:${diffSeconds.toString().padStart(2,'0')})`
+                document.querySelector("#tg000").innerHTML = `${ivent_name2}開始から ${diffDays + 1}日目。(${diffDays}.${pad(diffHours,2)}:${pad(diffMinutes,2)}:${pad(diffSeconds,2)})`
                 if( i_hours >= 0 && i_hours <= 4 ) {
                     if( i_day === 1 ) {
                         document.querySelector("#tg010").innerHTML = `第${i_week+1}週の${i_day}日目（${days[i_day % 7]}）です。`;
@@ -197,9 +198,9 @@
                 r_Seconds = Math.floor((r_Date % (1000 * 60)) / 1000);
 
                 if( r_Days > 0 ) {
-                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</span>`;
+                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
                 } else {
-                    document.querySelector("#tg020").innerHTML = `<span class"color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${r_Seconds.toString().padStart(2,'0')}秒 です。</span>`;
+                    document.querySelector("#tg020").innerHTML = `<span class"color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
                 }
             } else {
                 document.querySelector("#tg020").innerHTML = "";
