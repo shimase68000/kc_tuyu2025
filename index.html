@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-13
+  Last Updated: 2025-06-15
   HTML Version: WHATWG HTML Living Standard
 -->
 
@@ -107,6 +107,13 @@
 //            "恵方翼（新型航空機設計図）", 18, 99,
 //            "明石豆（改修資材）", 2, 99
         ];
+
+        const str_title_quest   = "【任務】";
+        const str_title_daily   = "　■Daily";
+        const str_title_weekly  = "　■Weekly";
+        const str_title_monthly = "　■Monthly";
+        const str_title_once    = "　■Once";
+        const str_dropped = "取りこぼし";
 
         // タイトル設定
         document.title = ivent_name;
@@ -271,10 +278,16 @@
 
             do {
                 r_myitem = myitem;
+                let d_item = sum - myitem;
                 document.querySelector("#tg300").innerHTML = `<span class="color_maxitem">${str_myitem}：
                     <span class="textstyle_bold"><button id="myitem_dec">ー</button>
                     <span id="myitem_sum">${myitem}</span>${str_counter_word}
                     <button id="myitem_inc">＋</button></span></span>`;
+                if( d_item > 0 ) {
+                    document.querySelector("#tg301").innerHTML = `　（${str_dropped}：<span class="textstyle_bold">${d_item}${str_counter_word}</span>）`;
+                } else {
+                    document.querySelector("#tg301").innerHTML = "";
+                }
 
                 // 報酬計算
                 let jj = -1;
@@ -283,15 +296,15 @@
                         let j = Math.floor(i / 3);
                         let cost = item[i + 1];
                         r_myitem -= item_count[j] * cost;
-                        document.querySelector(`#tg30${j + 1}`).innerHTML = `　●${item[i]} : 必要${str_item}数 ${cost}${str_counter_word}　
+                        document.querySelector(`#tg31${j + 1}`).innerHTML = `　●${item[i]} : 必要${str_item}数 ${cost}${str_counter_word}　
                             <button id="item_dec${j}">ー</button>
                             <span class="textstyle_bold"><span id="item_count${j}">${item_count[j]}</span>回交換</span>
                             <button id="item_inc${j}">＋</button>`;
                         if(item_count[j] > 0) {
                             jj = j;
-                            document.querySelector(`#tg31${j + 1}`).innerHTML = ` ⇒ <span class="textstyle_bold">${item_count[j] * item[i+1]}${str_counter_word}</span>消費`;
+                            document.querySelector(`#tg32${j + 1}`).innerHTML = ` ⇒ <span class="textstyle_bold">${item_count[j] * item[i+1]}${str_counter_word}</span>消費`;
                         } else {
-                            document.querySelector(`#tg31${j + 1}`).innerHTML = "";
+                            document.querySelector(`#tg32${j + 1}`).innerHTML = "";
                         }
                     }
                 });
@@ -337,13 +350,13 @@
 
         if((d_quest.length + w_quest.length + m_quest.length + s_quest.length) > 0) {
             const p = document.createElement("p");
-            p.textContent = "【任務】";
+            p.textContent = `${str_title_quest}`;
             p.style.fontWeight = "bold";
             document.body.appendChild(p);
         }
         if( d_quest.length > 0 ) {
             const p = document.createElement("p");
-            p.textContent = "　■Daily";
+            p.textContent = `${str_title_daily}`;
             document.body.appendChild(p);
             d_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
@@ -355,7 +368,7 @@
         }
         if( w_quest.length > 0 ) {
             const p = document.createElement("p");
-            p.textContent = "　■Weekly";
+            p.textContent = `${str_title_weekly}`;
             document.body.appendChild(p);
             w_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
@@ -367,7 +380,7 @@
         }
         if( m_quest.length > 0 ) {
             const p = document.createElement("p");
-            p.textContent = "　■Monthly";
+            p.textContent = `${str_title_monthly}`;
             document.body.appendChild(p);
             m_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
@@ -379,7 +392,7 @@
         }
         if( s_quest.length > 0 ) {
             const p = document.createElement("p");
-            p.textContent = "　■One-time";
+            p.textContent = `${str_title_once}`;
             document.body.appendChild(p);
             s_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
@@ -395,7 +408,7 @@
 
         if( STATUS !== "報酬不明" ) {
             const p300 = document.createElement("p");
-            p300.id = "tg300"
+            p300.innerHTML = `<span id="tg300"></span><span id="tg301"></span>`
             document.body.appendChild(p300);
 
             if( item.length > 0 ) {
@@ -407,7 +420,7 @@
                 item.forEach((_, i) => {
                     if(i % 3 === 0) {
                         const p = document.createElement("p");
-                        p.innerHTML = `<span id="tg30${Math.floor(i/3)+1}"></span><span id="tg31${Math.floor(i/3)+1}"></span>`;
+                        p.innerHTML = `<span id="tg31${Math.floor(i/3)+1}"></span><span id="tg32${Math.floor(i/3)+1}"></span>`;
                         document.body.appendChild(p);
                      }
                 });
