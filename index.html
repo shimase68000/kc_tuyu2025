@@ -2,8 +2,27 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-15
+  Last Updated: 2025-06-19
   HTML Version: WHATWG HTML Living Standard
+
+  License: MIT License
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
 -->
 
 <!DOCTYPE html>
@@ -11,10 +30,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Gothic&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+          --indent-default: 0em;
+          --indent-quest_title: 0em;
+          --indent-quest_subtitle: 1em;
+          --indent-quest_item: 2em;
+          --indent-reward_title: 0em;
+          --indent-reward_item: 1em;
+        }
+
+        .indent-default {
+            margin-left: var(--indent_default);
+        }
+        .indent-quest_title {
+            margin-left: var(--indent-quest_title);
+        }
+        .indent-quest_subtitle {
+            margin-left: var(--indent-quest_subtitle);
+        }
+        .indent-quest_item {
+            margin-left: var(--indent-quest_item);
+        }
+        .indent-reward_title {
+            margin-left: var(--indent-reward_title);
+        }
+        .indent-reward_item {
+            margin-left: var(--indent-reward_item);
+        }
+
+        .marker.subtitle::before { content: "■"; }
+        .marker.remaining::before { content: "🌟"; }
+        .marker.item::before { content: "🔹"; }    /* blue diamond */
+/*        .marker.item::before { content: "🔸"; } */   /* red diamond */
+
         body {
             background-color: #f3eade;
+            font-family: 'Sawarabi Gothic', sans-serif;
         }
         .syutugeki_text {
             color: #ec6463;
@@ -47,6 +103,9 @@
         .textstyle_bold {
             font-weight: bold;
         }
+        .underline-wavy_red {
+            text-decoration: underline wavy red;
+        }
     </style>
 </head>
 
@@ -64,16 +123,21 @@
         const ivent_name  = "艦これ 2025梅雨イベント てるてる坊主計算";
         const ivent_name2 = "梅雨イベント";
 
-        const str_maxitem  = "◎最大てるてる坊主数";
-        const str_myitem   = "◎現在のてるてる坊主数";
-        const str_r_myitem = "◎てるてる坊主残数";
+        const str_item_name = "てるてる坊主";
+        const str_maxitem  = `最大${str_item_name}数`;
+        const str_myitem   = `現在の${str_item_name}数`;
+        const str_r_myitem = `${str_item_name}残数`;
         const str_item     = "坊主";
         const str_counter_word = "体";  // "個";
+
+        const exp_maxitem  = `現時点で取得できる${str_item_name}の最大数`;
+        const exp_myitem   = `現時点であなたが取得している${str_item_name}数に合わせてください`;
+        const exp_r_myitem = `報酬交換後の残り${str_item_name}数`;
 
         const key_myitem = "kcolle_tuyu2025_teruteru";
 
         const baseDate   = new Date("2025-05-30T05:00:00");  // イベント開始日時
-        const finishDate = new Date("2025-06-30T11:00:00");  // イベント終了日時 仮置き
+        const finishDate = new Date("2025-06-31T11:00:00");  // イベント終了日時 仮置き
 /////// イベント毎に変更 ↑↑↑ ここまで ↑↑↑
 
         const remindTime = 6 * (24 * 60 * 60 * 1000);      // リマインドの表示は終了 6日前から
@@ -109,10 +173,11 @@
         ];
 
         const str_title_quest   = "【任務】";
-        const str_title_daily   = "　■Daily";
-        const str_title_weekly  = "　■Weekly";
-        const str_title_monthly = "　■Monthly";
-        const str_title_once    = "　■Once";
+        const str_title_daily   = "Daily";
+        const str_title_weekly  = "Weekly";
+        const str_title_monthly = "Monthly";
+        const str_title_once    = "Once";
+        const str_title_reward  = "【報酬】";
         const str_dropped = "取りこぼし";
 
         // タイトル設定
@@ -207,7 +272,7 @@
                 if( r_Days > 0 ) {
                     document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
                 } else {
-                    document.querySelector("#tg020").innerHTML = `<span class"color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
+                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
                 }
             } else {
                 document.querySelector("#tg020").innerHTML = "";
@@ -222,7 +287,7 @@
                     if (i % 2 === 0) {
                         let name = d_quest[i];
                         let count = d_quest[i + 1];
-                        document.querySelector(`#tg10${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffDays + 1} ⇒ <span class="textstyle_bold">${count * (diffDays + 1)}${str_counter_word}</span>`;
+                        document.querySelector(`#tg10${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffDays + 1} ⇒ <span class="textstyle_bold">${count * (diffDays + 1)}${str_counter_word}</span>`;
                         sum += count * (diffDays + 1);
                     }
                 });
@@ -232,7 +297,7 @@
                     if (i % 2 === 0) {
                         let name = w_quest[i];
                         let count = w_quest[i + 1];
-                        document.querySelector(`#tg11${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${i_week} ⇒ <span class="textstyle_bold">${count * i_week}${str_counter_word}</span>`;
+                        document.querySelector(`#tg11${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${i_week} ⇒ <span class="textstyle_bold">${count * i_week}${str_counter_word}</span>`;
                         sum += count * i_week;
                     }
                 });
@@ -242,7 +307,7 @@
                     if (i % 2 === 0) {
                         let name = m_quest[i];
                         let count = m_quest[i + 1];
-                        document.querySelector(`#tg12${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffMonths} ⇒ <span class="textstyle_bold">${count * diffMonths}${str_counter_word}</span>`;
+                        document.querySelector(`#tg12${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffMonths} ⇒ <span class="textstyle_bold">${count * diffMonths}${str_counter_word}</span>`;
                         sum += count * diffMonths;
                     }
                 });
@@ -252,13 +317,13 @@
                     if (i % 2 === 0) {
                         let name = s_quest[i];
                         let count = s_quest[i + 1];
-                        document.querySelector(`#tg13${Math.floor(i / 2)}`).innerHTML = `　<span>${name}</span> : ${str_item}${count}${str_counter_word} ⇒ <span class="textstyle_bold">${count}${str_counter_word}</span>`;
+                        document.querySelector(`#tg13${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ⇒ <span class="textstyle_bold">${count}${str_counter_word}</span>`;
                         sum += count;
                     }
                 });
 
                 myitem = isLocalStorageAvailable() ? localStorage.getItem(key_myitem) || sum : sum;
-                document.querySelector("#tg200").innerHTML = `<span class="color_maxitem">${str_maxitem}：<span class="textstyle_bold">${sum}${str_counter_word}</span></span>`;
+                document.querySelector("#tg200").innerHTML = `<span class="color_maxitem marker remaining" title=${exp_maxitem}>${str_maxitem}：<span class="textstyle_bold underline-wavy_red">${sum}${str_counter_word}</span></span>`;
             }
 
             if( STATUS !== "報酬不明" ) d_tg300();
@@ -279,7 +344,7 @@
             do {
                 r_myitem = myitem;
                 let d_item = sum - myitem;
-                document.querySelector("#tg300").innerHTML = `<span class="color_maxitem">${str_myitem}：
+                document.querySelector("#tg300").innerHTML = `<span class="color_maxitem marker remaining" title=${exp_myitem}>${str_myitem}：
                     <span class="textstyle_bold"><button id="myitem_dec">ー</button>
                     <span id="myitem_sum">${myitem}</span>${str_counter_word}
                     <button id="myitem_inc">＋</button></span></span>`;
@@ -296,7 +361,7 @@
                         let j = Math.floor(i / 3);
                         let cost = item[i + 1];
                         r_myitem -= item_count[j] * cost;
-                        document.querySelector(`#tg31${j + 1}`).innerHTML = `　●${item[i]} : 必要${str_item}数 ${cost}${str_counter_word}　
+                        document.querySelector(`#tg31${j + 1}`).innerHTML = `${item[i]} : 必要${str_item}数 ${cost}${str_counter_word}　
                             <button id="item_dec${j}">ー</button>
                             <span class="textstyle_bold"><span id="item_count${j}">${item_count[j]}</span>回交換</span>
                             <button id="item_inc${j}">＋</button>`;
@@ -313,7 +378,8 @@
 
             } while( r_myitem < 0 );
 
-            document.querySelector("#tg400").innerHTML = `<span class="color_r_myitem">${str_r_myitem}：<span class="textstyle_bold">${r_myitem}${str_counter_word}</span></span>`;
+            // 残数
+            document.querySelector("#tg400").innerHTML = `<span class="color_r_myitem marker remaining" title=${exp_r_myitem}>${str_r_myitem}：<span class="textstyle_bold underline-wavy_red">${r_myitem}${str_counter_word}</span></span>`;
         }
 
         function isLocalStorageAvailable() {
@@ -352,16 +418,21 @@
             const p = document.createElement("p");
             p.textContent = `${str_title_quest}`;
             p.style.fontWeight = "bold";
+            p.classList.add("indent-quest_title");
             document.body.appendChild(p);
         }
         if( d_quest.length > 0 ) {
             const p = document.createElement("p");
             p.textContent = `${str_title_daily}`;
+            p.classList.add("indent-quest_subtitle");
+            p.classList.add("marker", "subtitle");
             document.body.appendChild(p);
             d_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
                     const p = document.createElement("p");
                     p.id = `tg10${Math.floor(i / 2)}`;
+                    p.classList.add("indent-quest_item");
+                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -369,11 +440,15 @@
         if( w_quest.length > 0 ) {
             const p = document.createElement("p");
             p.textContent = `${str_title_weekly}`;
+            p.classList.add("indent-quest_subtitle");
+            p.classList.add("marker", "subtitle");
             document.body.appendChild(p);
             w_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
                     const p = document.createElement("p");
                     p.id = `tg11${Math.floor(i / 2)}`;
+                    p.classList.add("indent-quest_item");
+                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -381,11 +456,15 @@
         if( m_quest.length > 0 ) {
             const p = document.createElement("p");
             p.textContent = `${str_title_monthly}`;
+            p.classList.add("indent-quest_subtitle");
+            p.classList.add("marker", "subtitle");
             document.body.appendChild(p);
             m_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
                     const p = document.createElement("p");
                     p.id = `tg12${Math.floor(i / 2)}`;
+                    p.classList.add("indent-quest_item");
+                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -393,11 +472,15 @@
         if( s_quest.length > 0 ) {
             const p = document.createElement("p");
             p.textContent = `${str_title_once}`;
+            p.classList.add("indent-quest_subtitle");
+            p.classList.add("marker", "subtitle");
             document.body.appendChild(p);
             s_quest.forEach((_, i) => {
                 if(i % 2 === 0) {
                     const p = document.createElement("p");
                     p.id = `tg13${Math.floor(i / 2)}`;
+                    p.classList.add("indent-quest_item");
+                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -413,14 +496,17 @@
 
             if( item.length > 0 ) {
                 const p = document.createElement("p");
-                p.textContent = "【報酬】";
+                p.textContent = `${str_title_reward}`;
                 p.style.fontWeight = "bold";
+                p.classList.add("indent-reward_title");
                 document.body.appendChild(p);
 
                 item.forEach((_, i) => {
                     if(i % 3 === 0) {
                         const p = document.createElement("p");
                         p.innerHTML = `<span id="tg31${Math.floor(i/3)+1}"></span><span id="tg32${Math.floor(i/3)+1}"></span>`;
+                        p.classList.add("indent-reward_item");
+                        p.classList.add("marker", "item");
                         document.body.appendChild(p);
                      }
                 });
