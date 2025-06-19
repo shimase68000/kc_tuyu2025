@@ -105,6 +105,13 @@
         }
         .underline-wavy_red {
             text-decoration: underline wavy red;
+            text-decoration-thickness: auto;
+        }
+
+        @supports not (text-decoration-style: wavy) {
+          .underline-wavy_red {
+            text-decoration-style: solid;
+          }
         }
     </style>
 </head>
@@ -137,10 +144,10 @@
         const key_myitem = "kcolle_tuyu2025_teruteru";
 
         const baseDate   = new Date("2025-05-30T05:00:00");  // イベント開始日時
-        const finishDate = new Date("2025-06-31T11:00:00");  // イベント終了日時 仮置き
+        const finishDate = new Date("2025-06-27T11:00:00");  // イベント終了日時 確定
 /////// イベント毎に変更 ↑↑↑ ここまで ↑↑↑
 
-        const remindTime = 6 * (24 * 60 * 60 * 1000);      // リマインドの表示は終了 6日前から
+        const remindTime = 6 * (24 * 60 * 60 * 1000);  // リマインドの表示はイベント終了の 6日前から
         const s_count  = 60;  // 時刻補正は60秒毎
 
         const days = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
