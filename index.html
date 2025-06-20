@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-19
+  Last Updated: 2025-06-20
   HTML Version: WHATWG HTML Living Standard
 
   License: MIT License
@@ -65,6 +65,7 @@
 
         .marker.subtitle::before { content: "■"; }
         .marker.remaining::before { content: "🌟"; }
+        .marker.remind2::before { content: "⚠️"; }
         .marker.item::before { content: "🔹"; }    /* blue diamond */
 /*        .marker.item::before { content: "🔸"; } */   /* red diamond */
 
@@ -92,6 +93,10 @@
             color: #ff0000;
             font-weight: bold;
         }
+        .color_remind2 {
+            color: #a02828;
+            font-weight: normal;
+        }
         .color_maxitem {
             color: #0000ff;
             font-weight: normal;
@@ -107,7 +112,7 @@
             text-decoration: underline wavy red;
             text-decoration-thickness: auto;
         }
-
+        /* 波線非対応なら下線に変更する */
         @supports not (text-decoration-style: wavy) {
           .underline-wavy_red {
             text-decoration-style: solid;
@@ -122,6 +127,7 @@
     <p id="tg000"></p>
     <p><span id="tg010"></span><span id="tg011"></span></p>
     <p id="tg020"></p>
+    <p id="tg021"></p>
 
     <script>
         const STATUS = "報酬不明"; // "報酬有り";
@@ -136,6 +142,7 @@
         const str_r_myitem = `${str_item_name}残数`;
         const str_item     = "坊主";
         const str_counter_word = "体";  // "個";
+        const str_remind2  = `イベント終了後、${str_item_name}は報酬と交換可能になります。`;
 
         const exp_maxitem  = `現時点で取得できる${str_item_name}の最大数`;
         const exp_myitem   = `現時点であなたが取得している${str_item_name}数に合わせてください`;
@@ -276,6 +283,7 @@
                 r_Minutes = Math.floor((r_Date % (1000 * 60 * 60)) / (1000 * 60));
                 r_Seconds = Math.floor((r_Date % (1000 * 60)) / 1000);
 
+                document.querySelector("#tg021").innerHTML = `<span class="color_remind2 marker remind2">${str_remind2}</span>`;
                 if( r_Days > 0 ) {
                     document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
                 } else {
@@ -283,6 +291,7 @@
                 }
             } else {
                 document.querySelector("#tg020").innerHTML = "";
+                document.querySelector("#tg021").innerHTML = "";
             }
 
             if (diffDays !== prevDays) {
