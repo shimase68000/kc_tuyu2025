@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-20
+  Last Updated: 2025-06-22
   HTML Version: WHATWG HTML Living Standard
 
   License: MIT License
@@ -66,6 +66,7 @@
         .marker.subtitle::before { content: "■"; }
         .marker.remaining::before { content: "🌟"; }
         .marker.remind2::before { content: "⚠️"; }
+        .marker.fin_item::before { content: "📊"; }
         .marker.item::before { content: "🔹"; }    /* blue diamond */
 /*        .marker.item::before { content: "🔸"; } */   /* red diamond */
 
@@ -130,28 +131,31 @@
     <p id="tg021"></p>
 
     <script>
-        const STATUS = "報酬不明"; // "報酬有り";
+        const STATUS_FIN = "終了日確定"; // "終了日不明";
+        const STATUS_REW = "報酬不明"; // "報酬有り";
 
 /////// イベント毎に変更 ↓↓↓ ここから ↓↓↓
         const ivent_name  = "艦これ 2025梅雨イベント てるてる坊主計算";
         const ivent_name2 = "梅雨イベント";
 
+        const baseDate   = new Date("2025-05-30T05:00:00");  // イベント開始日時
+        const finishDate = new Date("2025-06-27T11:00:00");  // イベント終了日時（確定）
+
+        const key_myitem = "kcolle_tuyu2025_teruteru";
+
         const str_item_name = "てるてる坊主";
-        const str_maxitem  = `最大${str_item_name}数`;
-        const str_myitem   = `現在の${str_item_name}数`;
-        const str_r_myitem = `${str_item_name}残数`;
-        const str_item     = "坊主";
+        const str_maxitem   = `最大${str_item_name}数`;
+        const str_myitem    = `現在の${str_item_name}数`;
+        const str_r_myitem  = `${str_item_name}残数`;
+        const str_item      = "坊主";
         const str_counter_word = "体";  // "個";
-        const str_remind2  = `イベント終了後、${str_item_name}は報酬と交換可能になります。`;
+        const str_remind2   = `イベント終了後、${str_item_name}は報酬と交換可能になります。`;
+        const str_fin_item  = `イベント終了時点での最大${str_item_name}数は `;
+        const str_fin_item2 = ` となる見込みです。`;
 
         const exp_maxitem  = `現時点で取得できる${str_item_name}の最大数`;
         const exp_myitem   = `現時点であなたが取得している${str_item_name}数に合わせてください`;
         const exp_r_myitem = `報酬交換後の残り${str_item_name}数`;
-
-        const key_myitem = "kcolle_tuyu2025_teruteru";
-
-        const baseDate   = new Date("2025-05-30T05:00:00");  // イベント開始日時
-        const finishDate = new Date("2025-06-27T11:00:00");  // イベント終了日時 確定
 /////// イベント毎に変更 ↑↑↑ ここまで ↑↑↑
 
         const remindTime = 6 * (24 * 60 * 60 * 1000);  // リマインドの表示はイベント終了の 6日前から
@@ -202,6 +206,7 @@
         let myitem = 0;
         let r_myitem = 0;
         let sum = 0;
+        let f_sum = 0;
         let item_count = Array(item.length / 3).fill(0);
 
         let t_count = 0;
@@ -229,34 +234,60 @@
             return currentDate - targetDate;
         }
 
-        async function main() {
-            let diffMs = await calculateTimeDifference(baseDate);
-            let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-            let diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-            let diffMonths = (currentDate.getFullYear() - baseDate.getFullYear()) * 12;
-            diffMonths += (currentDate.getMonth() - baseDate.getMonth() + 1);
+        function daycount(diffTime) {
+            let days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((diffTime % (1000 * 60)) / 1000);
 
             let days_adjust = (baseDate.getDay() + 6) % 7;
-            let i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
+            let weeks = Math.floor((days + days_adjust) / 7) + 1;
+
+            return{
+                days:    days,
+                hours:   hours,
+                minutes: minutes,
+                seconds: seconds,
+                weeks:   weeks
+            };
+        }
+
+        function monthcount(targetDate) {
+            let diffMonths = (targetDate.getFullYear() - baseDate.getFullYear()) * 12;
+            diffMonths += (targetDate.getMonth() - baseDate.getMonth() + 1);
+
+            return diffMonths;
+        }
+
+        async function main() {
+            let diffMs = await calculateTimeDifference(baseDate);
+            let dTime = daycount( diffMs );
+
+            let diffDays = dTime.days;
+            let diffHours = dTime.hours;
+            let diffMinutes = dTime.minutes;
+            let diffSeconds = dTime.seconds;
+
+            let diffMonths = monthcount( currentDate );
+
+            let i_week = dTime.weeks;
             let i_day = (currentDate.getDay() + 6) % 7 + 1;
             let i_hours = currentDate.getHours();
 
             let tempDiff = finishDate - baseDate;
+            dTime = daycount( tempDiff );
             if( diffMs >= tempDiff ) {
                 let tempDays = diffDays;
                 let tempHours = diffHours;
                 let tempMinutes = diffMinutes;
                 let tempSeconds = diffSeconds;
 
-                diffDays = Math.floor(tempDiff / (1000 * 60 * 60 * 24));
-                diffHours = Math.floor((tempDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                diffMinutes = Math.floor((tempDiff % (1000 * 60 * 60)) / (1000 * 60));
-                diffSeconds = Math.floor((tempDiff % (1000 * 60)) / 1000);
+                diffDays = dTime.days;
+                diffHours = dTime.hours;
+                diffMinutes = dTime.minutes;
+                diffSeconds = dTime.seconds;
 
-                i_week = Math.floor((diffDays + days_adjust) / 7) + 1;
+                i_week = dTime.weeks;
 
                 document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${pad(diffHours,2)}:${pad(tempMinutes,2)}:${pad(tempSeconds,2)})`
                 document.querySelector("#tg010").innerHTML = "";
@@ -276,18 +307,28 @@
                 }
             }
 
+            let finDate = finishDate - baseDate;
+            dTime = daycount( finDate );
+            let f_Days = dTime.days;
+            let f_Hours = dTime.hours;
+            let f_Minutes = dTime.minutes;
+            let f_Seconds = dTime.seconds;
+            let f_Weeks = dTime.weeks;
+            let f_Months = monthcount( finishDate );
+
             let r_Date = finishDate - currentDate + 1000;
             if( r_Date <= remindTime && r_Date > 0 ) {
-                r_Days = Math.floor(r_Date / (1000 * 60 * 60 * 24));
-                r_Hours = Math.floor((r_Date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                r_Minutes = Math.floor((r_Date % (1000 * 60 * 60)) / (1000 * 60));
-                r_Seconds = Math.floor((r_Date % (1000 * 60)) / 1000);
+                dTime = daycount( r_Date );
+                r_Days = dTime.days;
+                r_Hours = dTime.hours;
+                r_Minutes = dTime.minutes;
+                r_Seconds = dTime.seconds;
 
                 document.querySelector("#tg021").innerHTML = `<span class="color_remind2 marker remind2">${str_remind2}</span>`;
                 if( r_Days > 0 ) {
-                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
+                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Days}日と${r_Hours}時間${pad(r_Minutes,2)}分${pad(r_Seconds,2)}秒 です。</span>`;
                 } else {
-                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Hours}時間${r_Minutes}分${pad(r_Seconds,2)}秒 です。</span>`;
+                    document.querySelector("#tg020").innerHTML = `<span class="color_remind">イベント終了まで、あと ${r_Hours}時間${pad(r_Minutes,2)}分${pad(r_Seconds,2)}秒 です。</span>`;
                 }
             } else {
                 document.querySelector("#tg020").innerHTML = "";
@@ -297,6 +338,7 @@
             if (diffDays !== prevDays) {
                 prevDays = diffDays;
                 sum = 0;
+                f_sum = 0;
 
                 // Daily 任務
                 d_quest.forEach((_, i) => {
@@ -305,6 +347,7 @@
                         let count = d_quest[i + 1];
                         document.querySelector(`#tg10${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffDays + 1} ⇒ <span class="textstyle_bold">${count * (diffDays + 1)}${str_counter_word}</span>`;
                         sum += count * (diffDays + 1);
+                        f_sum += count * (f_Days + 1);
                     }
                 });
 
@@ -315,6 +358,7 @@
                         let count = w_quest[i + 1];
                         document.querySelector(`#tg11${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${i_week} ⇒ <span class="textstyle_bold">${count * i_week}${str_counter_word}</span>`;
                         sum += count * i_week;
+                        f_sum += count * f_Weeks;
                     }
                 });
 
@@ -325,6 +369,7 @@
                         let count = m_quest[i + 1];
                         document.querySelector(`#tg12${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ×${diffMonths} ⇒ <span class="textstyle_bold">${count * diffMonths}${str_counter_word}</span>`;
                         sum += count * diffMonths;
+                        f_sum += count * f_Months;
                     }
                 });
 
@@ -335,14 +380,20 @@
                         let count = s_quest[i + 1];
                         document.querySelector(`#tg13${Math.floor(i / 2)}`).innerHTML = `<span>${name}</span> : ${str_item}${count}${str_counter_word} ⇒ <span class="textstyle_bold">${count}${str_counter_word}</span>`;
                         sum += count;
+                        f_sum += count;
                     }
                 });
 
                 myitem = isLocalStorageAvailable() ? localStorage.getItem(key_myitem) || sum : sum;
                 document.querySelector("#tg200").innerHTML = `<span class="color_maxitem marker remaining" title=${exp_maxitem}>${str_maxitem}：<span class="textstyle_bold underline-wavy_red">${sum}${str_counter_word}</span></span>`;
             }
+            if( STATUS_FIN === "終了日確定" && r_Date <= remindTime && r_Date > 0 ) {
+                document.querySelector("#tg210").innerHTML = `<span class="color_r_myitem marker fin_item" title=${exp_maxitem}>${str_fin_item}<span class="textstyle_bold underline-wavy_red">${f_sum}${str_counter_word}</span>${str_fin_item2}</span>`;
+            } else {
+                document.querySelector("#tg210").innerHTML = "";
+            }
 
-            if( STATUS !== "報酬不明" ) d_tg300();
+            if( STATUS_REW !== "報酬不明" ) d_tg300();
 
             document.querySelectorAll("p").forEach(function(p) {
                 p.innerHTML = p.innerHTML.replace(/<span>\[出撃\]/g, '<span class="syutugeki_text">[出撃]');
@@ -409,7 +460,7 @@
             }
         }
 
-        if( STATUS !== "報酬不明" ) {
+        if( STATUS_REW !== "報酬不明" ) {
             // ボタンのイベント処理
             document.addEventListener("click", (event) => {
                 if (event.target.id === "myitem_inc" && myitem < sum) {
@@ -448,7 +499,6 @@
                     const p = document.createElement("p");
                     p.id = `tg10${Math.floor(i / 2)}`;
                     p.classList.add("indent-quest_item");
-                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -464,7 +514,6 @@
                     const p = document.createElement("p");
                     p.id = `tg11${Math.floor(i / 2)}`;
                     p.classList.add("indent-quest_item");
-                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -480,7 +529,6 @@
                     const p = document.createElement("p");
                     p.id = `tg12${Math.floor(i / 2)}`;
                     p.classList.add("indent-quest_item");
-                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -496,7 +544,6 @@
                     const p = document.createElement("p");
                     p.id = `tg13${Math.floor(i / 2)}`;
                     p.classList.add("indent-quest_item");
-                    p.classList.add("marker", "item");
                     document.body.appendChild(p);
                 }
             });
@@ -504,8 +551,11 @@
         const p200 = document.createElement("p");
         p200.id = "tg200"
         document.body.appendChild(p200);
+        const p210 = document.createElement("p");
+        p210.id = "tg210"
+        document.body.appendChild(p210);
 
-        if( STATUS !== "報酬不明" ) {
+        if( STATUS_REW !== "報酬不明" ) {
             const p300 = document.createElement("p");
             p300.innerHTML = `<span id="tg300"></span><span id="tg301"></span>`
             document.body.appendChild(p300);
