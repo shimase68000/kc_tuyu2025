@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-06-22
+  Last Updated: 2025-06-27
   HTML Version: WHATWG HTML Living Standard
 
   License: MIT License
@@ -67,8 +67,8 @@
         .marker.remaining::before { content: "🌟"; }
         .marker.remind2::before { content: "⚠️"; }
         .marker.fin_item::before { content: "📊"; }
-        .marker.item::before { content: "🔹"; }    /* blue diamond */
-/*        .marker.item::before { content: "🔸"; } */   /* red diamond */
+/*        .marker.item::before { content: "🔹"; } */   /* blue diamond */
+        .marker.item::before { content: "🔸"; }    /* red diamond */
 
         body {
             background-color: #f3eade;
@@ -132,7 +132,7 @@
 
     <script>
         const STATUS_FIN = "終了日確定"; // "終了日不明";
-        const STATUS_REW = "報酬不明"; // "報酬有り";
+        const STATUS_REW = "報酬有り"; // "報酬不明";
 
 /////// イベント毎に変更 ↓↓↓ ここから ↓↓↓
         const ivent_name  = "艦これ 2025梅雨イベント てるてる坊主計算";
@@ -156,6 +156,7 @@
         const exp_maxitem  = `現時点で取得できる${str_item_name}の最大数`;
         const exp_myitem   = `現時点であなたが取得している${str_item_name}数に合わせてください`;
         const exp_r_myitem = `報酬交換後の残り${str_item_name}数`;
+        const exp_fin_item = `イベント終了時点で取りこぼしがなかった場合の${str_item_name}数`;
 /////// イベント毎に変更 ↑↑↑ ここまで ↑↑↑
 
         const remindTime = 6 * (24 * 60 * 60 * 1000);  // リマインドの表示はイベント終了の 6日前から
@@ -184,10 +185,10 @@
         // イベント報酬
         const item = [
 // 報酬名称, 必要アイテム数, 報酬上限
-//            "対潜哨戒柊（東海(九〇一空)）[要]開発資材x80", 33, 1,
-//            "改装設計桝（改装設計図）", 20, 99,
-//            "恵方翼（新型航空機設計図）", 18, 99,
-//            "明石豆（改修資材）", 2, 99
+            "Ho229", 22, 1,
+            "砂浜への出撃準備棚、GFCS Mk.37", 18, 1,
+            "海色リボン", 12, 1,
+            "改修資材x1、高速修復材x1", 1, 10
         ];
 
         const str_title_quest   = "【任務】";
@@ -289,7 +290,7 @@
 
                 i_week = dTime.weeks;
 
-                document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${pad(diffHours,2)}:${pad(tempMinutes,2)}:${pad(tempSeconds,2)})`
+                document.querySelector("#tg000").innerHTML = `<span class="color_ivent_finish">${ivent_name2}は ${diffDays + 1}日間開催され、終了しました。</span> (${tempDays}.${pad(tempHours,2)}:${pad(tempMinutes,2)}:${pad(tempSeconds,2)})`
                 document.querySelector("#tg010").innerHTML = "";
                 document.querySelector("#tg011").innerHTML = "";
             } else {
@@ -385,10 +386,11 @@
                 });
 
                 myitem = isLocalStorageAvailable() ? localStorage.getItem(key_myitem) || sum : sum;
+                if( myitem > sum ) myitem = sum; // myitem上限補正
                 document.querySelector("#tg200").innerHTML = `<span class="color_maxitem marker remaining" title=${exp_maxitem}>${str_maxitem}：<span class="textstyle_bold underline-wavy_red">${sum}${str_counter_word}</span></span>`;
             }
-            if( STATUS_FIN === "終了日確定" && r_Date <= remindTime && r_Date > 0 ) {
-                document.querySelector("#tg210").innerHTML = `<span class="color_r_myitem marker fin_item" title=${exp_maxitem}>${str_fin_item}<span class="textstyle_bold underline-wavy_red">${f_sum}${str_counter_word}</span>${str_fin_item2}</span>`;
+            if( STATUS_FIN === "終了日確定" && r_Date > 0 ) {
+                document.querySelector("#tg210").innerHTML = `<span class="color_r_myitem marker fin_item" title=${exp_fin_item}>${str_fin_item}<span class="textstyle_bold underline-wavy_red">${f_sum}${str_counter_word}</span>${str_fin_item2}</span>`;
             } else {
                 document.querySelector("#tg210").innerHTML = "";
             }
