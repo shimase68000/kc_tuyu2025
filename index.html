@@ -2,7 +2,7 @@
   File: index.html
   Author: UG.
   Created: 2025-06-03
-  Last Updated: 2025-07-02
+  Last Updated: 2026-09-23
   HTML Version: WHATWG HTML Living Standard
 
   License: MIT License
@@ -113,6 +113,13 @@
             text-decoration: underline wavy red;
             text-decoration-thickness: auto;
         }
+        .footer {
+            margin-top: 2em;
+            padding-top: 0.5em;
+            border-top: 1px solid #c0c0c0;
+            font-size: 0.8em;
+            color: #606060;
+        }
         /* 波線非対応なら下線に変更する */
         @supports not (text-decoration-style: wavy) {
           .underline-wavy_red {
@@ -157,6 +164,8 @@
         const exp_myitem   = `現時点であなたが取得している${str_item_name}数に合わせてください`;
         const exp_r_myitem = `報酬交換後の残り${str_item_name}数`;
         const exp_fin_item = `イベント終了時点で取りこぼしがなかった場合の${str_item_name}数`;
+
+        const STR_FOOTER = `Copyright &copy; 2025-2026 UG.<br>This software is released under the MIT License.`;
 /////// イベント毎に変更 ↑↑↑ ここまで ↑↑↑
 
         const remindTime = 6 * (24 * 60 * 60 * 1000);  // リマインドの表示はイベント終了の 6日前から
@@ -188,7 +197,7 @@
             "Ho229", 22, 1,
             "砂浜への出撃準備棚、GFCS Mk.37", 18, 1,
             "海色リボン", 12, 1,
-            "改修資材x1、高速修復材x1", 1, 99
+            "改修資材x1、高速修復材x1", 1, 10
         ];
 
         const str_title_quest   = "【任務】";
@@ -254,8 +263,10 @@
         }
 
         function monthcount(targetDate) {
-            let diffMonths = (targetDate.getFullYear() - baseDate.getFullYear()) * 12;
-            diffMonths += (targetDate.getMonth() - baseDate.getMonth() + 1);
+            let td = targetDate;
+            if( td > finishDate ) td = finishDate;
+            let diffMonths = (td.getFullYear() - baseDate.getFullYear()) * 12;
+            diffMonths += (td.getMonth() - baseDate.getMonth() + 1);
 
             return diffMonths;
         }
@@ -583,6 +594,14 @@
             const p400 = document.createElement("p");
             p400.id = "tg400"
             document.body.appendChild(p400);
+        }
+
+        // フッター（ivdata.js の STR_FOOTER を最下部に表示）
+        if( typeof STR_FOOTER !== "undefined" && STR_FOOTER !== "" ) {
+            const footer = document.createElement("footer");
+            footer.innerHTML = STR_FOOTER;
+            footer.classList.add("footer");
+            document.body.appendChild(footer);
         }
 
         setInterval(main, 1000);
